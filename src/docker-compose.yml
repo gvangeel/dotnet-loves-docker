@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  aspmssql:
+    image: ${DOCKER_REGISTRY-}aspmssql
+    build:
+      context: .
+      dockerfile: AspMsSQL/Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "8888:80"
+    restart: always
+    environment:
+      - DBHOST=db
+      - DBPORT=1433
+      - DBUSER=sa
+      - DBPASSWORD=SqlPassword!
+      - DBNAME=YellowDB
+      - ASPNETCORE_ENVIRONMENT=Development
+
+  db:
+    image: mcr.microsoft.com/azure-sql-edge
+    
+    volumes:
+      - sqlsystem:/var/opt/mssql/
+      - sqldata:/var/opt/sqlserver/data
+      - sqllog:/var/opt/sqlserver/log
+      - sqlbackup:/var/opt/sqlserver/backup
+
+    ports:
+      - "1433:1433"
+    restart: always
+    
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: SqlPassword!
+
+volumes:
+  sqlsystem:
+  sqldata:
+  sqllog:
+  sqlbackup:
